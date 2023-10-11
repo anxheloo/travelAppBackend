@@ -5,16 +5,15 @@ var jwt = require("jsonwebtoken");
 
 module.exports = {
   createUser: async (req, res, next) => {
-    const newUser = new User({
-      username: req.body.username,
-      email: req.body.email,
-      password: CryptoJS.AES.encrypt(
-        req.body.password,
-        process.env.SECRETB
-      ).toString(),
-    });
-
     try {
+      const newUser = new User({
+        username: req.body.username,
+        email: req.body.email,
+        password: CryptoJS.AES.encrypt(
+          req.body.password,
+          process.env.SECRETB
+        ).toString(),
+      });
       await newUser.save();
       res
         .status(201)
@@ -64,7 +63,6 @@ module.exports = {
       );
 
       const userId = user._id;
-
       res.status(200).json({
         status: true,
         id: userId,
