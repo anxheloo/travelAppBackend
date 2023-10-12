@@ -1,4 +1,5 @@
 const Hotel = require("../models/Hotel");
+const Review = require("../models/Review");
 
 module.exports = {
   addHotel: async (req, res, next) => {
@@ -44,11 +45,20 @@ module.exports = {
   },
 
   getHotel: async (req, res, next) => {
+    const queryParameter = req.query.limit;
+
     try {
       //we can use : {_id:1, place_id:1} -> so we only inclide these properties instead of using exclusion: "-popular -description".
       // using : {_id:0, place_id:0} -> it is an exclusion similar to "-_id -place_id"
       // or we can include properties: {"_id place_id description"}
-      const hotels = await Hotel.find({}, "-facilities._id");
+
+      let limit = "";
+
+      if (queryParameter !== "all") {
+        limit = Number(queryParameter) || 4;
+      }
+
+      const hotels = await Hotel.find({}, "-facilities._id").limit(limit);
 
       res
         .status(200)
@@ -67,6 +77,7 @@ module.exports = {
         "-createdAt -updatedAt -__v"
       ).populate({
         path: "reviews",
+        options: { limit: 2, sort: { updatedAt: -1 } }, //we get only 2 reviews from the hotel
         select: " rating review updatedAt user",
         populate: {
           path: "user",
@@ -82,6 +93,20 @@ module.exports = {
         });
       }
 
+      // Fetch all reviews associated with the hotel
+      // const reviews = await Review.find({
+      //   place: hotelId,
+      // })
+      //   .select("rating review updatedAt user")
+      //   .populate({
+      //     path: "user",
+      //     model: "User",
+      //     select: "username profile",
+      //   })
+      //   .limit(2); // Set the limit to 2 reviews;
+
+      // hotel.reviews = reviews;
+
       res.status(200).json({
         status: true,
         message: `Hotel with id: ${hotelId} exists!`,
@@ -95,8 +120,15 @@ module.exports = {
   getHotelByCountry: async (req, res, next) => {
     try {
       const countryId = req.params.countryId;
+      const limitParams = req.query.limit;
 
-      const hotels = await Hotel.find({ country_id: countryId });
+      let limit = "";
+
+      if (limitParams !== "all") {
+        limit = Number(limitParams) || 4;
+      }
+
+      const hotels = await Hotel.find({ country_id: countryId }).limit(limit);
 
       if (hotels.length === 0) {
         return res.status(200).json({

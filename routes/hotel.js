@@ -7,5 +7,6 @@ router.get("/", hotelController.getHotel);
 router.get("/:id", hotelController.getHotelById);
 router.get("/byCountry/:countryId", hotelController.getHotelByCountry);
 // router.get("/search/:key", hotelController.search);
+router.post("/addReview", hotelController.addReviewToHotel);
 
 module.exports = router;

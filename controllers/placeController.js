@@ -43,13 +43,37 @@ module.exports = {
 
   getPlaces: async (req, res, next) => {
     try {
+      const limitParams = req.query.limit;
       //we can use : {_id:1, place_id:1} -> so we only inclide these properties instead of using exclusion: "-popular -description".
       // using : {_id:0, place_id:0} -> it is an exclusion similar to "-_id -place_id"
       // or we can include properties: {"_id place_id description"}
+
+      //WAY 1- MY OWN WAY
+      //-------------------
+
+      let limit = "";
+      if (limitParams !== "all") {
+        limit = Number(limitParams) || 5;
+      }
       const places = await Place.find(
         {},
         "-description -popular -createdAt -updatedAt -__v"
-      );
+      ).limit(limit); //-> limit the amount of results we get to "5"
+
+      //WAY 2 - UDEMY WAY
+      //--------------------
+
+      // let query = Place.find(
+      //   {},
+      //   "-description -popular -createdAt -updatedAt -__v"
+      // );
+
+      // if (limitParams !== "all") {
+      //   const limit = parseInt(limitParams) || 5;
+      //   query = query.limit(limit);
+      // }
+
+      // const places = await query.exec();
 
       res
         .status(200)
