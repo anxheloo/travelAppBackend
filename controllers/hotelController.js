@@ -121,11 +121,12 @@ module.exports = {
     try {
       const countryId = req.params.countryId;
       const limitParams = req.query.limit;
+      // const
 
       let limit = "";
 
       if (limitParams !== "all") {
-        limit = Number(limitParams) || 4;
+        limit = Number(limitParams) || 2;
       }
 
       const hotels = await Hotel.find({ country_id: countryId }).limit(limit);

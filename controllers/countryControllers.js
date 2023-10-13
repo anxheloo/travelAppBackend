@@ -45,12 +45,10 @@ module.exports = {
       // }
 
       if (country.popular.includes(placeId)) {
-        return res
-          .status(400)
-          .json({
-            status: false,
-            message: `Place with id: ${placeId} is already added!`,
-          });
+        return res.status(400).json({
+          status: false,
+          message: `Place with id: ${placeId} is already added!`,
+        });
       }
 
       country.popular.push(placeId);
@@ -69,8 +67,12 @@ module.exports = {
     try {
       const countries = await Country.find(
         {},
-        "-description -region -popular -createdAt -updatedAt -__v"
+        "-description -region -createdAt -updatedAt -__v"
       );
+      // .populate({
+      //   path: "popular",
+      //   select: "title rating review imageUrl location",
+      // });
 
       res.status(201).json({
         status: true,
@@ -92,7 +94,11 @@ module.exports = {
         "-createdAt -updatedAt -__v"
       ).populate({
         path: "popular",
-        select: "title rating review imageUrl location",
+        // select: "title rating review imageUrl location description",
+        populate: {
+          path: "popular",
+          model: "Hotel",
+        },
       });
 
       if (!country) {

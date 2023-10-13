@@ -57,7 +57,7 @@ module.exports = {
       }
       const places = await Place.find(
         {},
-        "-description -popular -createdAt -updatedAt -__v"
+        "-popular -description -createdAt -updatedAt -__v"
       ).limit(limit); //-> limit the amount of results we get to "5"
 
       //WAY 2 - UDEMY WAY
@@ -115,11 +115,18 @@ module.exports = {
   getPlaceByCountry: async (req, res, next) => {
     try {
       const countryId = req.params.countryId;
+      const limitParam = req.query.limit;
+
+      let limit = "";
+
+      if (limitParam !== "all") {
+        limit = Number(limitParam) || 1;
+      }
 
       const places = await Place.find(
         { country_id: countryId },
         "-popular -createdAt -updatedAt -__v"
-      );
+      ).limit(limit);
 
       if (places.length === 0) {
         return res.status(200).json({
