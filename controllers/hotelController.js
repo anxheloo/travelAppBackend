@@ -71,13 +71,21 @@ module.exports = {
   getHotelById: async (req, res, next) => {
     const hotelId = req.params.id;
 
+    const limitParameter = req.query.limit;
+
+    let limit = "";
+
+    if (limitParameter !== "all") {
+      limit = Number(limitParameter) || 2;
+    }
+
     try {
       const hotel = await Hotel.findById(
         hotelId,
         "-createdAt -updatedAt -__v"
       ).populate({
         path: "reviews",
-        options: { limit: 2, sort: { updatedAt: -1 } }, //we get only 2 reviews from the hotel
+        options: { limit: limit, sort: { updatedAt: -1 } }, //we get only 2 reviews from the hotel
         select: " rating review updatedAt user",
         populate: {
           path: "user",
